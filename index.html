@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#163d2a">
+<title>Kas Kantor</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;600;700;800;900&display=swap');
+*{box-sizing:border-box}
+body{margin:0;background:#faf6ee;color:#142238;font-family:'Nunito',Arial,Helvetica,sans-serif}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:radial-gradient(#17304a 0.6px,transparent 0.6px);background-size:9px 9px}
+
+button,input,textarea{font:inherit}button{cursor:pointer;border:0}main{max-width:980px;margin:auto;padding:24px 16px 60px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+.eyebrow{font-size:12px;font-weight:900;letter-spacing:.12em;color:#f0a900;text-transform:uppercase}h1{margin:2px 0;font-size:34px;font-weight:900;letter-spacing:-1px}
+.primary{background:#17304a;color:#fff;padding:12px 17px;border-radius:14px;font-weight:900;border:3px solid #17304a;box-shadow:4px 4px 0 #f3b51b}
+.hero{background:#fffdf8;border:3px solid #17304a;border-radius:24px;padding:23px;display:flex;justify-content:space-between;align-items:center;box-shadow:7px 7px 0 #f3b51b;position:relative}
+.hero span,small{color:#68716f;font-size:13px}.hero strong{display:block;font-size:34px;margin-top:7px;color:#17304a}
+.stats{display:flex;gap:32px}.stats b{display:block;margin-top:5px}.in{color:#176ed1}.out{color:#d9362c}
+.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:28px 0 12px}.toolbar input{width:280px;padding:12px 14px;border:3px solid #17304a;border-radius:14px;background:#fffdf8;outline:none}
+.list{display:grid;gap:8px}.tx{display:flex;align-items:center;gap:12px;background:#fffdf8;border:2px solid #17304a;padding:14px;border-radius:17px;box-shadow:3px 3px 0 #dfe7ef}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}.dot.masuk{background:#176ed1}.dot.keluar{background:#d9362c}.txmain{flex:1;min-width:0}
+.txline{display:flex;justify-content:space-between;gap:10px}.txline strong{white-space:nowrap}.tx button{background:#fff0bf;color:#17304a;padding:9px 11px;border-radius:11px;font-weight:900;border:2px solid #17304a}
+.empty{text-align:center;background:#fff;border-radius:14px;padding:40px;color:#78847d}
+.modal{position:fixed;inset:0;background:#17304ab8;display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
+.card{background:#fffdf8;border:3px solid #17304a;border-radius:22px;padding:21px;width:100%;max-width:480px;max-height:90vh;overflow:auto;box-shadow:7px 7px 0 #f3b51b}
+.modalhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}.close{background:none;font-size:28px;color:#65716a}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0}label input,label textarea{display:block;width:100%;margin-top:6px;border:2px solid #17304a;border-radius:11px;padding:11px;background:#fff}
+textarea{min-height:70px;resize:vertical}.seg{display:flex;gap:7px;margin-top:6px}.seg button{flex:1;padding:11px;border-radius:11px;background:#edf1ee;color:#536159;border:2px solid #17304a;font-weight:900}.seg button:active{transform:translateY(1px)}.seg .active{background:#d9362c;color:#fff;box-shadow:3px 3px 0 #f3b51b}.seg button:last-child.active{background:#176ed1;color:#fff}
+.wide{width:100%;margin-top:10px}.receipt{text-align:left}.receipt .id{font-size:12px;color:#d9362c;font-weight:900}.receipt hr{border:0;border-top:2px dashed #17304a}
+.row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #edf0ee;font-size:13px}.amount{text-align:center;font-size:31px;font-weight:900;padding:20px 0;color:#176ed1}
+.tools{display:flex;gap:8px;margin-top:12px}.tools button{flex:1;padding:10px;border-radius:11px;background:#fff0bf;border:2px solid #17304a;font-weight:800;color:#17304a}
+footer{margin-top:30px;text-align:center;color:#68716f;font-size:12px;font-weight:700}
+@media(max-width:650px){main{padding:17px 11px 50px}header{align-items:flex-start}.hero{display:block}.stats{margin-top:22px;justify-content:space-between}.toolbar{flex-direction:column;align-items:stretch}.toolbar input{width:100%}.tx{flex-wrap:wrap}.txmain{width:calc(100% - 24px)}.tx>button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<header>
+<div><div class="eyebrow">⚡ KAS KANTOR ⚡</div><h1>Uang Kas Ruangan EP</h1></div>
+<button class="primary" onclick="openForm()">＋ Catat Transaksi</button>
+</header>
+
+<section class="hero">
+<div><span>Saldo Kas</span><strong id="saldo">Rp0</strong></div>
+<div class="stats"><div><small>Pemasukan</small><b class="in" id="masuk">Rp0</b></div><div><small>Pengeluaran</small><b class="out" id="keluar">Rp0</b></div></div>
+</section>
+
+<section class="toolbar"><h2>Riwayat Transaksi</h2><input id="search" placeholder="Cari transaksi..." oninput="render()"></section>
+<section id="list" class="list"></section>
+
+<div class="tools">
+<button onclick="exportData()">⬇ Backup Data</button>
+<button onclick="importData()">⬆ Restore Data</button>
+<button onclick="clearData()">Hapus Semua</button>
+</div>
+
+<footer>Kas Kantor • Data tersimpan di browser perangkat ini</footer>
+</main>
+
+<div id="modal" class="modal" style="display:none">
+<div class="card" id="modalContent"></div>
+</div>
+<input id="fileInput" type="file" accept=".json" style="display:none" onchange="restoreFile(event)">
+
+<script>
+const KEY="kas-kantor-transactions-v1";
+let txs=JSON.parse(localStorage.getItem(KEY)||"[]").map(t=>({
+ id:t.id,tanggal:t.tanggal,jenis:t.jenis,keterangan:t.keterangan,nominal:nominalNumber(t.nominal),pic:t.pic||""
+}));
+
+const rupiah=n=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(n);
+const dateID=d=>new Date(d+"T00:00:00").toLocaleDateString("id-ID",{day:"2-digit",month:"short",year:"numeric"});
+function save(){localStorage.setItem(KEY,JSON.stringify(txs))}
+function idBaru(tanggal){
+ const [y,m,d]=tanggal.split("-");
+ return "EP-"+d+m+y;
+}
+
+function render(){
+ const q=document.getElementById("search").value.toLowerCase();
+ let masuk=0,keluar=0;
+ txs.forEach(t=>t.jenis==="masuk"?masuk+=t.nominal:keluar+=t.nominal);
+ document.getElementById("masuk").textContent=rupiah(masuk);
+ document.getElementById("keluar").textContent=rupiah(keluar);
+ document.getElementById("saldo").textContent=rupiah(masuk-keluar);
+ const arr=txs.filter(t=>(t.keterangan+" "+t.pic+" "+t.id).toLowerCase().includes(q));
+ document.getElementById("list").innerHTML=arr.length?arr.map(t=>`
+ <article class="tx">
+ <div class="dot ${t.jenis}"></div>
+ <div class="txmain"><div class="txline"><b>${esc(t.keterangan)}</b><strong class="${t.jenis}">${t.jenis==="masuk"?"+":"-"} ${rupiah(t.nominal)}</strong></div>
+ <small>${dateID(t.tanggal)} · ${esc(t.pic||"Tanpa PIC")} · ${t.id}</small></div>
+ <button onclick="lihat('${t.id}')">Lihat</button><button onclick="bagikan('${t.id}')">Bagikan</button>
+ </article>`).join(""):'<div class="empty">Belum ada transaksi.</div>';
+}
+function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function openForm(){
+ const today=new Date().toISOString().slice(0,10);
+ document.getElementById("modalContent").innerHTML=`<div class="modalhead"><h2>Transaksi Baru</h2><button class="close" onclick="closeModal()">×</button></div>
+ <form onsubmit="submitTx(event)">
+ <label>Tanggal<input id="tanggal" type="date" value="${today}" required></label>
+ <label>Jenis<div class="seg"><button type="button" id="btnKeluar" class="active" onclick="setJenis('keluar')">🔴 Pengeluaran</button><button type="button" id="btnMasuk" onclick="setJenis('masuk')">🔵 Pemasukan</button></div></label>
+ <input id="jenis" type="hidden" value="keluar">
+ <label>Keterangan<input id="ket" required placeholder="Contoh: Konsumsi rapat"></label>
+ <label>Nominal<input id="nominal" type="text" inputmode="numeric" required placeholder="350.000" oninput="formatNominal(this)"></label>
+ <label>Dibayar / diterima oleh<input id="pic" placeholder="Nama PIC"></label>
+ <button class="primary wide">Simpan Transaksi</button></form>`;
+ document.getElementById("modal").style.display="flex";
+}
+function setJenis(x){
+ document.getElementById("jenis").value=x;
+ document.getElementById("btnKeluar").classList.toggle("active",x==="keluar");
+ document.getElementById("btnMasuk").classList.toggle("active",x==="masuk");
+}
+function formatNominal(el){
+ const raw = String(el.value || "").replace(/[^0-9]/g,"");
+ if (!raw) {
+   el.value = "";
+   return;
+ }
+ el.value = raw.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+}
+function nominalNumber(value){
+ const raw = String(value || "").replace(/[^0-9]/g,"");
+ return raw ? parseInt(raw, 10) : 0;
+}
+function submitTx(e){
+ e.preventDefault();
+ const tanggalEl=document.getElementById("tanggal");
+ const jenisEl=document.getElementById("jenis");
+ const ketEl=document.getElementById("ket");
+ const nominalEl=document.getElementById("nominal");
+ const picEl=document.getElementById("pic");
+
+ let baseId=idBaru(tanggalEl.value), id=baseId, n=2;
+ while(txs.some(x=>x.id===id)){id=baseId+"-"+n;n++}
+
+ const t={
+   id:id,
+   tanggal:tanggalEl.value,
+   jenis:jenisEl.value,
+   keterangan:ketEl.value.trim(),
+   nominal:nominalNumber(nominalEl.value),
+   pic:picEl.value.trim()
+ };
+
+ txs.unshift(t);
+ save();
+ closeModal();
+ render();
+ lihat(t.id);
+}
+function closeModal(){document.getElementById("modal").style.display="none"}
+function get(id){return txs.find(t=>t.id===id)}
+function lihat(id){
+ const t=get(id); if(!t)return;
+ document.getElementById("modalContent").innerHTML=`<div class="receipt"><div class="modalhead"><h2>BUKTI TRANSAKSI</h2><button class="close" onclick="closeModal()">×</button></div>
+ <div class="id">${t.id}</div><hr>
+ <div class="row"><span>Tanggal</span><b>${dateID(t.tanggal)}</b></div>
+ <div class="row"><span>Jenis</span><b>${t.jenis.toUpperCase()}</b></div>
+ <div class="row"><span>Keterangan</span><b>${esc(t.keterangan)}</b></div>
+ <div class="amount">${rupiah(t.nominal)}</div>
+ <div class="row"><span>PIC</span><b>${esc(t.pic||"-")}</b></div>
+ 
+ <button class="primary wide" onclick="bagikan('${t.id}')">📤 Bagikan Bukti</button></div>`;
+ document.getElementById("modal").style.display="flex";
+}
+async function bagikan(id){
+ const t=get(id);if(!t)return;
+ const text=`BUKTI TRANSAKSI KAS KANTOR
+
+ID: ${t.id}
+Tanggal: ${dateID(t.tanggal)}
+Jenis: ${t.jenis.toUpperCase()}
+Keterangan: ${t.keterangan}
+Nominal: ${rupiah(t.nominal)}
+PIC: ${t.pic||"-"}`;
+ if(navigator.share){try{await navigator.share({title:"Bukti Transaksi",text})}catch(e){}}
+ else{await navigator.clipboard.writeText(text);alert("Bukti disalin. Silakan paste ke WhatsApp.");}
+}
+function exportData(){
+ const blob=new Blob([JSON.stringify(txs,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="backup-kas-kantor.json";a.click();URL.revokeObjectURL(a.href);
+}
+function importData(){document.getElementById("fileInput").click()}
+function restoreFile(e){
+ const f=e.target.files[0];if(!f)return;const r=new FileReader();
+ r.onload=()=>{try{const d=JSON.parse(r.result);if(!Array.isArray(d))throw 0;txs=d.map(t=>({id:t.id,tanggal:t.tanggal,jenis:t.jenis,keterangan:t.keterangan,nominal:nominalNumber(t.nominal),pic:t.pic||""}));save();render();alert("Data berhasil dipulihkan.")}catch{alert("File backup tidak valid.")}};
+ r.readAsText(f);e.target.value="";
+}
+function clearData(){if(confirm("Hapus semua transaksi di perangkat ini? Data yang sudah dibackup tidak ikut terhapus.")){txs=[];save();render()}}
+render();
+</script>
+</body>
+</html>
