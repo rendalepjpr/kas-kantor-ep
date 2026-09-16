@@ -17,11 +17,15 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px;ma
 .primary{background:#17304a;color:#fff;padding:12px 17px;border-radius:14px;font-weight:900;border:3px solid #17304a;box-shadow:4px 4px 0 #f3b51b}
 .hero{background:#fffdf8;border:3px solid #17304a;border-radius:24px;padding:23px;display:flex;justify-content:space-between;align-items:center;box-shadow:7px 7px 0 #f3b51b;position:relative}
 .hero span,small{color:#68716f;font-size:13px}.hero strong{display:block;font-size:34px;margin-top:7px;color:#17304a}
-.stats{display:flex;gap:32px}.stats b{display:block;margin-top:5px}.in{color:#176ed1}.out{color:#d9362c}
+.stats{display:flex;gap:32px}.stats b{display:block;margin-top:5px}.in,.masuk{color:#176ed1}.out,.keluar{color:#d9362c}
 .toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:28px 0 12px}.toolbar input{width:280px;padding:12px 14px;border:3px solid #17304a;border-radius:14px;background:#fffdf8;outline:none}
 .list{display:grid;gap:8px}.tx{display:flex;align-items:center;gap:12px;background:#fffdf8;border:2px solid #17304a;padding:14px;border-radius:17px;box-shadow:3px 3px 0 #dfe7ef}
-.dot{width:12px;height:12px;border-radius:50%;flex:none}.dot.masuk{background:#176ed1}.dot.keluar{background:#d9362c}.txmain{flex:1;min-width:0}
-.txline{display:flex;justify-content:space-between;gap:10px}.txline strong{white-space:nowrap}.tx button{background:#fff0bf;color:#17304a;padding:9px 11px;border-radius:11px;font-weight:900;border:2px solid #17304a}
+.dot{width:12px;height:12px;border-radius:50%;flex:none}.dot.masuk{background:#176ed1}.dot.keluar{background:#d9362c}.txmain{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.txline{display:flex;justify-content:space-between;gap:10px}.txline strong{white-space:nowrap}
+.txactions{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:nowrap;margin-left:auto}
+.txactions strong{white-space:nowrap;font-size:15px;font-weight:900;margin-right:2px}
+.txactions .masuk{color:#176ed1}.txactions .keluar{color:#d9362c}
+.tx button{background:#fff0bf;color:#17304a;padding:9px 11px;border-radius:11px;font-weight:900;border:2px solid #17304a;white-space:nowrap}
 .empty{text-align:center;background:#fff;border-radius:14px;padding:40px;color:#78847d}
 .modal{position:fixed;inset:0;background:#17304ab8;display:flex;align-items:center;justify-content:center;padding:16px;z-index:10}
 .card{background:#fffdf8;border:3px solid #17304a;border-radius:22px;padding:21px;width:100%;max-width:480px;max-height:90vh;overflow:auto;box-shadow:7px 7px 0 #f3b51b}
@@ -32,8 +36,9 @@ textarea{min-height:70px;resize:vertical}.seg{display:flex;gap:7px;margin-top:6p
 .row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid #edf0ee;font-size:13px}.amount{text-align:center;font-size:31px;font-weight:900;padding:20px 0;color:#176ed1}
 .tools{display:flex;gap:8px;margin-top:12px}.tools button{flex:1;padding:10px;border-radius:11px;background:#fff0bf;border:2px solid #17304a;font-weight:800;color:#17304a}
 footer{margin-top:30px;text-align:center;color:#68716f;font-size:12px;font-weight:700}
-@media(max-width:650px){main{padding:17px 11px 50px}header{align-items:flex-start}.hero{display:block}.stats{margin-top:22px;justify-content:space-between}.toolbar{flex-direction:column;align-items:stretch}.toolbar input{width:100%}.tx{flex-wrap:wrap}.txmain{width:calc(100% - 24px)}.tx>button{flex:1}}
+@media(max-width:650px){main{padding:17px 11px 50px}header{align-items:flex-start}.hero{display:block}.stats{margin-top:22px;justify-content:space-between}.toolbar{flex-direction:column;align-items:stretch}.toolbar input{width:100%}.tx{flex-wrap:wrap}.txmain{width:calc(100% - 24px);display:flex;flex-direction:column;align-items:flex-start}.txactions{width:100%;justify-content:flex-end}}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <main>
@@ -47,7 +52,8 @@ footer{margin-top:30px;text-align:center;color:#68716f;font-size:12px;font-weigh
 <div class="stats"><div><small>Pemasukan</small><b class="in" id="masuk">Rp0</b></div><div><small>Pengeluaran</small><b class="out" id="keluar">Rp0</b></div></div>
 </section>
 
-<section class="toolbar"><h2>Riwayat Transaksi</h2><input id="search" placeholder="Cari transaksi..." oninput="render()"></section>
+<section class="toolbar"><h2 id="historyTitle">Riwayat Transaksi</h2><input id="search" placeholder="Cari transaksi..." oninput="render()"></section>
+<div id="monthInfo" style="font-size:12px;color:#68716f;margin:-4px 0 10px 2px;font-weight:800"></div>
 <section id="list" class="list"></section>
 
 <div class="tools">
@@ -56,7 +62,7 @@ footer{margin-top:30px;text-align:center;color:#68716f;font-size:12px;font-weigh
 <button onclick="clearData()">Hapus Semua</button>
 </div>
 
-<footer>Kas Kantor • Data tersimpan di browser perangkat ini</footer>
+<footer>Kas Rendal EP • Data tersimpan di browser perangkat ini • Laporan bulan sebelumnya diarsipkan otomatis</footer>
 </main>
 
 <div id="modal" class="modal" style="display:none">
@@ -78,20 +84,147 @@ function idBaru(tanggal){
  return "EP-"+d+m+y;
 }
 
+
+function currentMonthKey(){
+ const d=new Date();
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function monthLabel(key){
+ const [y,m]=key.split("-");
+ return new Date(Number(y),Number(m)-1,1).toLocaleDateString("id-ID",{month:"long",year:"numeric"});
+}
+function monthBefore(key){
+ const [y,m]=key.split("-").map(Number);
+ const d=new Date(y,m-2,1);
+ return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;
+}
+function monthOf(date){
+ return String(date).slice(0,7);
+}
+function downloadMonthlyExcel(monthKey, rows, openingBalance){
+ if(!rows.length || typeof XLSX==="undefined") return;
+ const sorted=[...rows].sort((a,b)=>(a.tanggal+a.id).localeCompare(b.tanggal+b.id));
+ let running=Number(openingBalance)||0;
+ const detail=sorted.map((t,i)=>{
+   running += t.jenis==="masuk"?t.nominal:-t.nominal;
+   return {
+     "No":i+1,
+     "ID Transaksi":t.id,
+     "Tanggal":dateID(t.tanggal),
+     "Jenis":t.jenis==="masuk"?"PEMASUKAN":"PENGELUARAN",
+     "Keterangan":t.keterangan,
+     "PIC":t.pic||"",
+     "Nominal (Rp)":t.nominal,
+     "Saldo Berjalan (Rp)":running
+   };
+ });
+ const pemasukan=sorted.filter(t=>t.jenis==="masuk").reduce((s,t)=>s+t.nominal,0);
+ const pengeluaran=sorted.filter(t=>t.jenis==="keluar").reduce((s,t)=>s+t.nominal,0);
+ const saldoAkhir=running;
+ const summary=[
+   ["LAPORAN KAS RENDAL EP",""],
+   ["Periode",monthLabel(monthKey)],
+   ["Saldo Awal (Rp)",openingBalance],
+   ["Total Pemasukan (Rp)",pemasukan],
+   ["Total Pengeluaran (Rp)",pengeluaran],
+   ["Saldo Akhir (Rp)",saldoAkhir],
+   ["Jumlah Transaksi",sorted.length],
+   ["",""],
+   ["Keterangan","Nilai"],
+   ["Pemasukan",pemasukan],
+   ["Pengeluaran",pengeluaran],
+   ["Saldo Akhir",saldoAkhir]
+ ];
+ const wb=XLSX.utils.book_new();
+ const ws1=XLSX.utils.aoa_to_sheet(summary);
+ const ws2=XLSX.utils.json_to_sheet(detail);
+ ws1["!cols"]=[{wch:30},{wch:24}];
+ ws2["!cols"]=[{wch:7},{wch:19},{wch:16},{wch:16},{wch:30},{wch:20},{wch:20},{wch:24}];
+ ws1["!freeze"]="A2";
+ ws2["!freeze"]="A2";
+ ws2["!autofilter"]={ref:`A1:H${detail.length+1}`};
+ // Number formatting
+ for(const ws of [ws1,ws2]){
+   Object.keys(ws).forEach(addr=>{
+     if(addr[0]==="!"||!ws[addr]) return;
+     if((ws===ws1 && ["B3","B4","B5","B6","B10","B11","B12"].includes(addr)) ||
+        (ws===ws2 && (addr.startsWith("G")||addr.startsWith("H")))){
+       ws[addr].z='#,##0';
+     }
+   });
+ }
+ XLSX.utils.book_append_sheet(wb,ws1,"Ringkasan");
+ XLSX.utils.book_append_sheet(wb,ws2,"Transaksi");
+ XLSX.writeFile(wb,`Laporan_Kas_EP_${monthKey.replace("-","")}.xlsx`);
+}
+function processMonthlyRollover(){
+ const thisMonth=currentMonthKey();
+ let activeMonth=localStorage.getItem("kas-kantor-active-month");
+ let carry=Number(localStorage.getItem("kas-kantor-opening-balance")||"0");
+ if(!activeMonth){
+   // On first installation/opening, preserve the current month's transactions.
+   // Any older transactions already in storage are treated as archived months.
+   const old=txs.filter(t=>monthOf(t.tanggal)<thisMonth);
+   if(old.length){
+     const groups={};
+     old.forEach(t=>(groups[monthOf(t.tanggal)]??=[]).push(t));
+     let opening=carry;
+     Object.keys(groups).sort().forEach(m=>{
+       downloadMonthlyExcel(m,groups[m],opening);
+       opening += groups[m].reduce((s,t)=>s+(t.jenis==="masuk"?t.nominal:-t.nominal),0);
+     });
+     carry=opening;
+     txs=txs.filter(t=>monthOf(t.tanggal)===thisMonth);
+     save();
+     localStorage.setItem("kas-kantor-opening-balance",String(carry));
+   }
+   localStorage.setItem("kas-kantor-active-month",thisMonth);
+   return;
+ }
+ if(activeMonth===thisMonth) return;
+
+ // Month changed: archive every month before the current month.
+ const old=txs.filter(t=>monthOf(t.tanggal)<thisMonth);
+ if(!old.length){
+   localStorage.setItem("kas-kantor-active-month",thisMonth);
+   return;
+ }
+ const groups={};
+ old.forEach(t=>(groups[monthOf(t.tanggal)]??=[]).push(t));
+ let opening=carry;
+ Object.keys(groups).sort().forEach(m=>{
+   downloadMonthlyExcel(m,groups[m],opening);
+   opening += groups[m].reduce((s,t)=>s+(t.jenis==="masuk"?t.nominal:-t.nominal),0);
+ });
+ txs=txs.filter(t=>monthOf(t.tanggal)===thisMonth);
+ save();
+ localStorage.setItem("kas-kantor-opening-balance",String(opening));
+ localStorage.setItem("kas-kantor-active-month",thisMonth);
+}
+
 function render(){
  const q=document.getElementById("search").value.toLowerCase();
  let masuk=0,keluar=0;
  txs.forEach(t=>t.jenis==="masuk"?masuk+=t.nominal:keluar+=t.nominal);
+ const opening=Number(localStorage.getItem("kas-kantor-opening-balance")||"0");
  document.getElementById("masuk").textContent=rupiah(masuk);
  document.getElementById("keluar").textContent=rupiah(keluar);
- document.getElementById("saldo").textContent=rupiah(masuk-keluar);
- const arr=txs.filter(t=>(t.keterangan+" "+t.pic+" "+t.id).toLowerCase().includes(q));
+ document.getElementById("saldo").textContent=rupiah(opening+masuk-keluar);
+ const info=document.getElementById("monthInfo");
+ if(info) info.textContent="Periode aktif: "+monthLabel(currentMonthKey())+" • Saldo awal: "+rupiah(opening);
+ const current=currentMonthKey(); const arr=txs.filter(t=>monthOf(t.tanggal)===current && (t.keterangan+" "+t.pic+" "+t.id).toLowerCase().includes(q));
  document.getElementById("list").innerHTML=arr.length?arr.map(t=>`
  <article class="tx">
  <div class="dot ${t.jenis}"></div>
- <div class="txmain"><div class="txline"><b>${esc(t.keterangan)}</b><strong class="${t.jenis}">${t.jenis==="masuk"?"+":"-"} ${rupiah(t.nominal)}</strong></div>
- <small>${dateID(t.tanggal)} · ${esc(t.pic||"Tanpa PIC")} · ${t.id}</small></div>
- <button onclick="lihat('${t.id}')">Lihat</button><button onclick="bagikan('${t.id}')">Bagikan</button>
+ <div class="txmain">
+   <b>${esc(t.keterangan)}</b>
+   <small>${dateID(t.tanggal)} · ${esc(t.pic||"Tanpa PIC")} · ${t.id}</small>
+ </div>
+ <div class="txactions">
+   <strong class="${t.jenis}">${t.jenis==="masuk"?"+":"-"} ${rupiah(t.nominal)}</strong>
+   <button onclick="lihat('${t.id}')">Lihat</button>
+   <button onclick="bagikan('${t.id}')">Bagikan</button>
+ </div>
  </article>`).join(""):'<div class="empty">Belum ada transaksi.</div>';
 }
 function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
@@ -191,6 +324,7 @@ function restoreFile(e){
  r.readAsText(f);e.target.value="";
 }
 function clearData(){if(confirm("Hapus semua transaksi di perangkat ini? Data yang sudah dibackup tidak ikut terhapus.")){txs=[];save();render()}}
+processMonthlyRollover();
 render();
 </script>
 </body>
